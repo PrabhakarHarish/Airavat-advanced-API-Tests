@@ -1,0 +1,1 @@
+{"uuid": "0e50dc67-0ff0-4194-aa96-c238ff24f0d1", "children": ["1f446caa-02db-45f8-b450-e4547bfc9880"], "befores": [{"name": "sample_excel_bytes", "status": "passed", "start": 1789976773847, "stop": 1789976773853}], "afters": [{"name": "sample_excel_bytes::<lambda>", "start": 1789976773866}], "start": 1789976773847, "stop": 1789976773866}

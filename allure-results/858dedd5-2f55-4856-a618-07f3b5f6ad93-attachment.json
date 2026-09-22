@@ -1,0 +1,1 @@
+{"id": "model_64683", "name": "Model_A_Base", "owner": "analyst_alpha", "version": 1, "revenue": 1000000, "assumptions": {}, "cells": {"D18": {"value": 5000000, "formula": "=D16-D17"}}, "updated_at": 1789976464.6830323}

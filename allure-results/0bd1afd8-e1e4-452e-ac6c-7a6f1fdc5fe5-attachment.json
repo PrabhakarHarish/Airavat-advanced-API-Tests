@@ -1,0 +1,15 @@
+{
+  "url": "http://127.0.0.1:8008/API/excel/upload/",
+  "method": "POST",
+  "status_code": 200,
+  "elapsed_ms": "5.09 ms",
+  "request_headers": {
+    "User-Agent": "python-requests/2.34.2",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "X-CSRFToken": "csrf_1789976863",
+    "Authorization": "Bearer jwt_token_for_analyst_alpha_1789976863"
+  },
+  "request_payload": null
+}

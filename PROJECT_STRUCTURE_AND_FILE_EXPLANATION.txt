@@ -1,0 +1,755 @@
+================================================================================
+AIRAVAT PLATFORM - ADVANCED API TEST AUTOMATION FRAMEWORK
+DIRECTORY AND FILE ARCHITECTURE DETAILED SPECIFICATION GUIDE
+================================================================================
+
+1. FRAMEWORK OVERVIEW & ARCHITECTURAL OBJECTIVES
+--------------------------------------------------------------------------------
+This project is an enterprise-grade, production-ready Automated API Testing
+Framework engineered specifically for the Airavat Financial Modeling & Analytics
+Platform.
+
+The Airavat Platform performs intensive quantitative financial workflows:
+- Dynamic 3-statement financial modeling (Income Statement, Balance Sheet, Cash Flow).
+- Complex DCF (Discounted Cash Flow), WACC, EBITDA, and Valuation calculations.
+- Multi-tier recursive dependency graph formula resolutions.
+- Real-time cell-level autosave synchronization and scenario branching.
+- Spreadsheet parsing and generation (OpenXML / Excel .xlsx, .xlsm).
+- Multi-tenant data segregation, access control, and financial reporting.
+
+The testing framework covers 27 advanced end-to-end (E2E), mathematical precision,
+concurrency, file-parser hardening, security/IDOR, and performance benchmarks.
+It supports both live backend testing (against remote target environments such
+as https://10.20.11.244:3000) and fully autonomous offline execution via a built-in,
+high-fidelity, multi-threaded mock server engine.
+
+
+2. COMPLETE REPOSITORY DIRECTORY TREE
+--------------------------------------------------------------------------------
+.
+├── airavat_advanced_API_testcase.md
+├── README.md
+├── pytest.ini
+├── requirements.txt
+├── .env.example
+├── main.py
+│
+├── config/
+│   ├── __init__.py
+│   └── settings.py
+│
+├── test_data/
+│   ├── __init__.py
+│   └── payloads.py
+│
+├── utils/
+│   ├── __init__.py
+│   ├── api_client.py
+│   ├── async_client.py
+│   ├── assertions.py
+│   └── file_generator.py
+│
+├── mock_server/
+│   ├── __init__.py
+│   └── airavat_mock_api.py
+│
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── suite_01_e2e_pipelines/
+│   │   ├── __init__.py
+│   │   └── test_suite_01_e2e.py
+│   ├── suite_02_financial_engine/
+│   │   ├── __init__.py
+│   │   └── test_suite_02_finance.py
+│   ├── suite_03_concurrency/
+│   │   ├── __init__.py
+│   │   └── test_suite_03_concurrency.py
+│   ├── suite_04_file_parser/
+│   │   ├── __init__.py
+│   │   └── test_suite_04_file_parser.py
+│   ├── suite_05_security_idor/
+│   │   ├── __init__.py
+│   │   └── test_suite_05_security.py
+│   └── suite_06_performance/
+│       ├── __init__.py
+│       └── test_suite_06_performance.py
+│
+├── allure-results/              [Generated directory for Allure test artifacts]
+├── .pytest_cache/               [Generated directory for Pytest run states]
+├── .venv/                       [Virtual environment directory for Python packages]
+├── .idea/                       [IDE workspace settings]
+└── __pycache__/                 [Python bytecode cache directories]
+
+
+================================================================================
+3. ROOT-LEVEL CONFIGURATION & SPECIFICATION FILES
+================================================================================
+
+1. airavat_advanced_API_testcase.md
+--------------------------------------------------------------------------------
+- Location: Root directory
+- Purpose:
+  Comprehensive specification and functional requirements document detailing all
+  27 test case scenarios for the Airavat Financial Modeling Platform.
+- Detailed Contents:
+  * Defines the testing philosophy of Advanced E2E API Testing vs simple status
+    code checks.
+  * Details all 6 test suites with exact test objectives, severity ratings (Critical,
+    High, Normal, Minor), preconditions, step-by-step HTTP requests, payload structures,
+    and mathematical/security assertion criteria.
+  * Establishes concrete SLA metrics: Recalculation <= 1500ms, Search <= 300ms,
+    Circular Dependency Cutoff <= 500ms.
+  * Documents expected security behaviors: IDOR isolation (403/404), CSRF token
+    enforcement (403), XSS entity encoding, Formula Injection quote-prefixing,
+    and Zip Bomb decompression defense (413/400).
+
+2. README.md
+--------------------------------------------------------------------------------
+- Location: Root directory
+- Purpose:
+  Primary developer onboarding and operational runbook for the test suite.
+- Detailed Contents:
+  * Visual ASCII directory map of the test suite.
+  * Quick-start instructions for activating the virtual environment.
+  * Execution instructions for running in Mock mode (default) and Live backend mode.
+  * Exact pytest commands to run specific suites, individual test cases, or marker groups.
+  * Step-by-step commands to generate, view, and serve interactive HTML Allure reports.
+
+3. pytest.ini
+--------------------------------------------------------------------------------
+- Location: Root directory
+- Purpose:
+  Master configuration file for the Pytest execution engine.
+- Detailed Contents:
+  * Sets minimum pytest version requirement (`minversion = 8.0`).
+  * Configures discovery path (`testpaths = tests`) and root Python path (`pythonpath = .`).
+  * Configures default CLI flags in `addopts`:
+      - `-v`: Verbose output.
+      - `--alluredir=allure-results`: Automatically generates Allure report files.
+      - `--strict-markers`: Enforces strict marker registration to avoid typos.
+      - `--tb=short`: Produces clean, readable traceback formatting upon failure.
+  * Configures `pytest-asyncio` settings (`asyncio_mode = auto`, `asyncio_default_fixture_loop_scope = function`).
+  * Registers custom test classification markers:
+      - `critical`: Priority 1 (P1) tests.
+      - `high`: Priority 2 (P2) tests.
+      - `security`: Security, Tenant Isolation, and IDOR tests.
+      - `concurrency`: Concurrency, race condition, and stress tests.
+      - `financial`: Financial precision and calculation tests.
+      - `performance`: Latency benchmarks and rate limiting tests.
+
+4. requirements.txt
+--------------------------------------------------------------------------------
+- Location: Root directory
+- Purpose:
+  Specifies the pinned Python package dependencies required to run the framework.
+- Key Dependencies & Roles:
+  * `pytest==9.1.1`: Core testing engine.
+  * `pytest-asyncio==1.4.0`: Asynchronous test execution for concurrency testing.
+  * `pytest-xdist==3.8.0`: Parallel multi-process test runner support.
+  * `allure-pytest==2.16.1` & `allure-python-commons==2.16.1`: Rich test reporting.
+  * `requests==2.34.2`: Synchronous HTTP client for stateful user sessions.
+  * `httpx==0.28.1`: High-performance asynchronous HTTP client for race condition simulation.
+  * `openpyxl==3.1.5` & `et_xmlfile==2.0.0`: Programmatic Excel workbook creation & binary inspection.
+  * `pandas==3.0.6` & `numpy==2.5.3`: High-precision data structures and calculations.
+  * `python-dotenv==1.2.3`: Environment variable management from `.env`.
+  * `deepdiff==9.1.0`: Deep differential verification of nested JSON models.
+  * `jsonschema==4.26.0`: Strict JSON schema validation for API responses.
+  * `lxml==6.1.3`: XML manipulation for parser security tests.
+
+5. .env.example
+--------------------------------------------------------------------------------
+- Location: Root directory
+- Purpose:
+  Template environment file documenting all configurable parameters used by the
+  settings manager.
+- Key Variables:
+  * `AIRAVAT_BASE_URL`: Live backend API target (default `https://10.20.11.244:3000`).
+  * `AIRAVAT_USE_MOCK`: Toggles local mock server simulation (default `true`).
+  * `MOCK_HOST` / `MOCK_PORT`: Local mock server host/port (default `127.0.0.1:8008`).
+  * `TENANT_A_USER` / `TENANT_A_PASS`: Primary user credentials (`analyst_alpha`).
+  * `TENANT_B_USER` / `TENANT_B_PASS`: Secondary user credentials (`analyst_beta`).
+  * `AIRAVAT_VERIFY_SSL`: Disables SSL certificate verification for self-signed certificates.
+  * `AIRAVAT_TIMEOUT`: Global HTTP timeout in seconds (default `15.0`).
+  * `RECALC_SLA_MS`: SLA threshold for recalculation (1500 ms).
+  * `SEARCH_SLA_MS`: SLA threshold for search query latency (300 ms).
+  * `CIRCULAR_CUTOFF_MS`: SLA threshold for circular dependency cutoff (500 ms).
+
+6. main.py
+--------------------------------------------------------------------------------
+- Location: Root directory
+- Purpose:
+  Standard entry point script allowing execution of the test suite via `python main.py`.
+- Internal Logic:
+  Imports `sys` and `pytest`, invoking `sys.exit(pytest.main())`. Allows command-line
+  arguments to be forwarded directly into the pytest runner without requiring
+  the direct `pytest` executable in CI/CD pipeline wrappers.
+
+
+================================================================================
+4. CONFIGURATION DIRECTORY (`config/`)
+================================================================================
+Purpose:
+Houses centralized environment configuration loaders, parsing `.env` overrides,
+CLI switches, and providing immutable, strongly typed settings across the framework.
+
+1. config/__init__.py
+--------------------------------------------------------------------------------
+- Location: `config/__init__.py`
+- Purpose:
+  Exposes the configuration module's public interface (`Settings`, `get_settings`)
+  to allow clean imports across the framework.
+
+2. config/settings.py
+--------------------------------------------------------------------------------
+- Location: `config/settings.py`
+- Purpose:
+  Core dataclass encapsulating all runtime configuration parameters.
+- Detailed Breakdown:
+  * `Settings` class:
+      - `BASE_URL`: Sanitized target URL string.
+      - `USE_MOCK`: Boolean flag controlling whether tests target the internal mock
+        or the live backend.
+      - `MOCK_HOST` & `MOCK_PORT`: Network bind address and port for the mock engine.
+      - `TENANT_A_USERNAME` & `TENANT_A_PASSWORD`: Credentials for primary analyst.
+      - `TENANT_B_USERNAME` & `TENANT_B_PASSWORD`: Credentials for secondary analyst.
+      - `VERIFY_SSL`: Controls requests/httpx SSL verification behavior.
+      - `REQUEST_TIMEOUT`: Float seconds before requests abort.
+      - `RECALCULATION_SLA_MS`, `SEARCH_QUERY_SLA_MS`, `CIRCULAR_REF_CUTOFF_MS`:
+        SLA numeric limits in milliseconds for latency assertions.
+      - `effective_base_url` property: Dynamically returns `http://127.0.0.1:8008`
+        when `USE_MOCK=True`, or the external `BASE_URL` when `USE_MOCK=False`.
+  * `get_settings()` function:
+      - Thread-safe singleton accessor ensuring configuration is loaded once from
+        the environment and cached in memory.
+
+
+================================================================================
+5. TEST DATA DIRECTORY (`test_data/`)
+================================================================================
+Purpose:
+Houses realistic financial models, 3-statement P&L datasets, edge-case math scenarios,
+and cyber security attack payloads (XSS, Formula Injection, SQL Injection).
+
+1. test_data/__init__.py
+--------------------------------------------------------------------------------
+- Location: `test_data/__init__.py`
+- Purpose:
+  Packages test data generators and constant lists for clean imports across test files.
+
+2. test_data/payloads.py
+--------------------------------------------------------------------------------
+- Location: `test_data/payloads.py`
+- Purpose:
+  Supplies structured payloads representing actual financial statements and attack vectors.
+- Detailed Breakdown:
+  * `get_valid_pnl_dataset()`:
+      Returns a 4-quarter P&L matrix containing Operating Revenue, Direct Costs,
+      and Gross Profit with high-precision fractional float values.
+  * `get_circular_ref_payload()`:
+      Generates an autosave payload containing mutual recursion:
+      `A1 = "=B1 * 1.05"`, `B1 = "=A1 + 100"`.
+  * `get_div_by_zero_payload()`:
+      Generates a financial calculation payload where `Revenue = 0` and the formula
+      attempts `GrossMargin = GrossProfit / Revenue`.
+  * `get_cascade_formula_payload(discount_rate=0.10)`:
+      Produces assumptions for a DCF valuation model with projected free cash flows
+      (FCF), shares outstanding, net debt, and customizable discount rate.
+  * `get_multi_currency_payload()`:
+      Returns multi-subsidiary financials with three currencies (USD, EUR, INR)
+      and foreign exchange conversion rates for consolidated reporting.
+  * `get_model_assumptions_payload()`:
+      Standard economic variables: WACC (8.5%), terminal growth rate (3.0%), tax rate (25.0%).
+  * `get_cell_autosave_payload(cell, value, formula)`:
+      Payload modeling single-cell autosave interactions in spreadsheet UI grids.
+  * `get_heavy_recalc_dataset(periods=60, accounts=150)`:
+      Generates a massive 9,000-cell financial matrix (60 monthly periods across 150
+      line items) for performance and recalculation latency benchmarking.
+  * `XSS_PAYLOADS`:
+      Array of stored and reflected Cross-Site Scripting vectors, including `<script>`,
+      `<img>` with onerror handlers, and polymorphic SVG events.
+  * `FORMULA_INJECTION_PAYLOADS`:
+      Array of Dynamic Data Exchange (DDE) and formula command injection strings
+      (`=cmd|' /C calc'!A0`, `@SUM(1+1)*cmd|...`, etc.).
+
+
+================================================================================
+6. UTILITIES DIRECTORY (`utils/`)
+================================================================================
+Purpose:
+Central repository for shared automation infrastructure: synchronous and asynchronous
+API clients, custom assertions, and in-memory binary spreadsheet file generators.
+
+1. utils/__init__.py
+--------------------------------------------------------------------------------
+- Location: `utils/__init__.py`
+- Purpose:
+  Exports all utility clients, custom assertions, and file builders for easy consumption.
+
+2. utils/api_client.py
+--------------------------------------------------------------------------------
+- Location: `utils/api_client.py`
+- Purpose:
+  Production-grade synchronous HTTP client wrapping Python `requests.Session`.
+- Key Features & Methods:
+  * Persistent session handling: Preserves cookies (`sessionid`, `csrftoken`) and
+    bearer authorization tokens across chained requests.
+  * Allure Step Integration: Automatically wraps every request in an `allure.step`
+    and logs request details (URL, method, headers, payload, status, elapsed ms).
+  * Request timing: Measures execution time with `time.perf_counter()` and attaches
+    `elapsed_ms` directly to response objects.
+  * `_sync_csrf_headers()`: Automatically captures CSRF cookie and synchronizes
+    it to the `X-CSRFToken` header.
+  * Core verbs: `get()`, `post()`, `put()`, `patch()`, `delete()`.
+  * Domain-specific endpoints:
+      - `login(username, password)`: Handles credential submission, token storage.
+      - `logout()`: Clears active credentials and session tokens.
+      - `upload_excel(file_content, filename)`: Multipart file uploads.
+      - `validate_pnl(template_id)`: P&L balance verification.
+      - `convert_to_model(template_id, name)`: Converts uploaded file to model.
+      - `get_model(model_id)`: Retrieves model metadata and cell grids.
+      - `update_model(model_id, payload)`: Mutates assumptions and version.
+      - `autosave_cell(model_id, cell, value, formula)`: Submits cell edit.
+      - `export_excel(model_id)`: Streams exported binary workbook.
+      - `duplicate_model(model_id, new_name)`: Clones/branches a model.
+      - `delete_model(model_id)`: Deletes model entity.
+      - `recalculate(model_id, payload)`: Triggers recalculation engine.
+      - `get_preferred_profile()`: Verifies user session validity.
+
+3. utils/async_client.py
+--------------------------------------------------------------------------------
+- Location: `utils/async_client.py`
+- Purpose:
+  Asynchronous HTTP client leveraging `httpx.AsyncClient` for high-throughput
+  concurrency and race condition testing.
+- Key Methods:
+  * `autosave(client, model_id, cell, value, formula)`: Non-blocking cell autosave.
+  * `upload_file(client, file_bytes, filename)`: Asynchronous multipart upload.
+  * `create_model_with_idempotency(client, idempotency_key, payload)`: Dispatches
+    POST requests with `Idempotency-Key` headers to test double-submit locks.
+
+4. utils/assertions.py
+--------------------------------------------------------------------------------
+- Location: `utils/assertions.py`
+- Purpose:
+  Specialized assertion library for high-precision mathematical calculations,
+  security headers, and vulnerability defense validation.
+- Key Assertion Functions:
+  * `assert_financial_precision(actual, expected, decimal_places=4, tolerance=0.0001)`:
+      Uses Python's `decimal.Decimal` and `ROUND_HALF_UP` to prevent binary floating-point
+      inaccuracies (e.g., IEEE-754 float drift) from causing false test failures or
+      masking calculation inaccuracies.
+  * `assert_security_headers(headers, is_financial_endpoint=False)`:
+      Verifies presence and correctness of critical security headers:
+      - `X-Content-Type-Options: nosniff`
+      - `X-Frame-Options: DENY` or `SAMEORIGIN`
+      - `Strict-Transport-Security` (HSTS with max-age)
+      - `Cache-Control: no-store` / `no-cache` (enforced on financial endpoints).
+  * `assert_no_server_leakage(headers)`:
+      Verifies that `Server` and application headers do not leak framework runtime
+      versions (such as specific CPython versions or internal WSGI server software).
+  * `assert_no_stacktrace_in_error(response_body)`:
+      Scans error responses for sensitive source code leakage, including Python
+      tracebacks, database error messages, or internal file paths.
+  * `assert_xss_sanitized(content)`:
+      Ensures that script tags (`<script>`, `<img>`, `<svg>`) are either completely
+      stripped or converted into safe HTML entities (`&lt;`, `&gt;`).
+  * `assert_formula_sanitized(exported_cell_value)`:
+      Ensures spreadsheet formula trigger characters (`=`, `@`, `+`, `-`) are
+      disarmed (e.g., prepended with a single quote) to prevent CSV/Excel formula
+      command execution attacks.
+
+5. utils/file_generator.py
+--------------------------------------------------------------------------------
+- Location: `utils/file_generator.py`
+- Purpose:
+  Programmatic in-memory binary file generator producing valid 3-statement financial
+  workbooks and weaponized/corrupted files for security and parser robustness testing.
+- Key Generator Functions:
+  * `create_valid_financial_workbook()`:
+      Generates an in-memory `openpyxl.Workbook` containing three fully structured
+      sheets: Income Statement (with Operating Revenue, Operating Expenses, and formula
+      `=D16-D17`), Balance Sheet, and Cash Flow Statement. Returns an `io.BytesIO` buffer.
+  * `create_corrupted_financial_workbook()`:
+      Modifies a valid workbook's underlying OpenXML zip archive by replacing
+      `sheet2.xml` with malformed, unclosed XML tags to test parser rollback.
+  * `create_zip_bomb_xlsx()`:
+      Crafts an OpenXML archive with a massive uncompressed payload (10MB+ repeating
+      zero bytes) compressed into a tiny footprint to test decompression bomb defenses.
+  * `create_xxe_xlsx()`:
+      Injects a malicious XML DOCTYPE external entity declaration referencing
+      `file:///etc/passwd` into `xl/workbook.xml` to test XML External Entity defenses.
+  * `create_macro_enabled_xlsx()`:
+      Injects a binary `xl/vbaProject.bin` into an `.xlsx` archive to test VBA macro
+      detection, rejection, and stripping.
+  * `create_formula_injection_xlsx()`:
+      Generates a spreadsheet with executable command injection formulas in cells
+      (`=cmd|' /C calc'!A0`, `@SUM(1+1)*cmd|...`).
+  * `create_truncated_header_file()`:
+      Generates a raw byte sequence containing only the 10-byte ZIP magic header
+      (`PK\x03\x04...`) without payload or central directory to test corrupt stream handling.
+
+
+================================================================================
+7. MOCK SERVER DIRECTORY (`mock_server/`)
+================================================================================
+Purpose:
+Houses a high-fidelity, in-memory, multi-threaded HTTP server emulating the entire
+Airavat Platform API surface. It allows 100% of the 27 test scenarios to run
+offline, in CI/CD environments, or during air-gapped security audits.
+
+1. mock_server/__init__.py
+--------------------------------------------------------------------------------
+- Location: `mock_server/__init__.py`
+- Purpose:
+  Exports `MockAiravatServer` and `MockAiravatHandler`.
+
+2. mock_server/airavat_mock_api.py
+--------------------------------------------------------------------------------
+- Location: `mock_server/airavat_mock_api.py`
+- Purpose:
+  Full simulation of the Airavat REST API using Python standard library `http.server`
+  and `socketserver.ThreadingMixIn`.
+- Detailed Capabilities & Implemented Routes:
+  * `ThreadedHTTPServer`: Multi-threaded daemon server handling simultaneous connections.
+  * In-Memory State:
+      - `db_models`: Dict storing financial models, cell values, and versions.
+      - `active_sessions` & `active_tokens`: Authentication session registries.
+      - `idempotency_records`: Maps idempotency keys to created model IDs.
+      - `failed_login_attempts`: Rolling timestamp buffer for rate limiting.
+      - `lock`: Threading re-entrant lock (`RLock`) ensuring atomic operations.
+  * Security Headers:
+      Every response automatically receives `X-Content-Type-Options: nosniff`,
+      `X-Frame-Options: DENY`, `Strict-Transport-Security`, and `Server: Airavat-Gateway/1.0`.
+      Financial responses include `Cache-Control: no-store, no-cache`.
+  * Simulated Endpoints:
+      - `POST /API/login/`:
+          Authenticates valid users (`analyst_alpha`, `analyst_beta`). Returns JWT token,
+          session cookie, and CSRF cookie. Implements brute-force rate limiting: if > 5
+          failed attempts occur within 5 seconds, returns `429 Too Many Requests` with
+          `Retry-After: 5`.
+      - `GET /API/logout/`:
+          Invalidates tokens and cookies in the server's session registry.
+      - `POST /API/get-preferred-profile`:
+          Validates active authentication; rejects invalidated sessions with 401.
+      - `POST /API/excel/upload/`:
+          Parses multipart body. Rejects zero-byte/truncated streams with `400 Bad Request`
+          (`corrupt_file_header`). Rejects zip bombs with `413 Payload Too Large`.
+          Sanitizes XXE injections and returns a valid `upload_id`.
+      - `POST /API/excel/validate-pnl/`:
+          Returns `BALANCED` reconciliation status and `0.00` variance.
+      - `POST /API/excel/convert-to-model/`:
+          Converts uploaded templates to models. Rejects corrupt templates with
+          `422 Unprocessable Entity` (`PARSE_ERROR`).
+      - `POST /API/models/`:
+          Creates models. Enforces CSRF token checking for cookie-based sessions.
+          Supports `Idempotency-Key` headers to prevent duplicate creation on double-submit.
+          Sanitizes model names against XSS using HTML entity encoding.
+      - `GET /API/models/{id}/`:
+          Retrieves model state. Enforces tenant isolation (returns 403 if Tenant B
+          attempts to read Tenant A's model). Supports SQL injection query parameter testing.
+      - `PUT /API/models/{id}/`:
+          Updates assumptions and cells. Enforces tenant isolation. Implements
+          Optimistic Locking: rejects updates with stale version numbers with `409 Conflict`.
+          Simulates 4-tier formula cascade recalculations (Tier 0 -> Tier 4).
+      - `DELETE /API/models/{id}/`:
+          Deletes model. Enforces tenant isolation; returns `204 No Content`.
+      - `POST /API/models/{id}/autosave/`:
+          Saves cell edits. Implements recursive cycle detection: detects circular
+          references (e.g. A1 -> B1 -> A1) and returns `400 Bad Request`
+          (`CIRCULAR_DEPENDENCY_ERROR`) within SLA limits.
+      - `POST /API/models/{id}/duplicate/`:
+          Clones a model into an isolated child model with independent mutability.
+      - `POST /API/models/{id}/recalculate/`:
+          Evaluates P&L sums with 4-decimal precision, handles division by zero by
+          returning `#DIV/0!` cell errors without 500 crashes, processes multi-currency
+          FX consolidations, and evaluates 9,000-cell matrices under 1500ms.
+      - `GET /API/models/{id}/export/excel/`:
+          Generates binary `.xlsx` stream. Enforces tenant isolation and strips malicious
+          VBA macros and formula command triggers.
+
+
+================================================================================
+8. TEST SUITES DIRECTORY (`tests/`)
+================================================================================
+Purpose:
+Houses the shared pytest configuration, test fixtures, and all 6 specialized test
+suites covering the 27 test scenarios.
+
+1. tests/__init__.py
+--------------------------------------------------------------------------------
+- Location: `tests/__init__.py`
+- Purpose:
+  Declares `tests` as a Python package.
+
+2. tests/conftest.py
+--------------------------------------------------------------------------------
+- Location: `tests/conftest.py`
+- Purpose:
+  Central Pytest fixture provider and test lifecycle controller.
+- Key Fixtures & Functions:
+  * `pytest_addoption(parser)`:
+      Adds `--live` and `--mock` command-line flags to pytest.
+  * `settings(request)`:
+      Session-scoped fixture. Reads configuration and allows CLI flags (`--live` or `--mock`)
+      to override `settings.USE_MOCK`.
+  * `mock_server(settings)`:
+      Session-scoped autouse fixture. When running in mock mode, automatically spins up
+      `MockAiravatServer` in a background daemon thread before any tests run, and cleanly
+      shuts it down after all test suites finish.
+  * `unauth_client(settings)`:
+      Function-scoped fixture providing a fresh, unauthenticated `AiravatApiClient`.
+  * `tenant_a_client(settings)`:
+      Function-scoped fixture providing an authenticated client for Tenant A (`analyst_alpha`).
+  * `tenant_b_client(settings)`:
+      Function-scoped fixture providing an authenticated client for Tenant B (`analyst_beta`),
+      used for IDOR and tenant boundary testing.
+  * `sample_excel_bytes()`:
+      Fixture generating a fresh, valid in-memory 3-statement Excel workbook byte array.
+  * `tenant_a_model(tenant_a_client, sample_excel_bytes)`:
+      Yield-based fixture that creates a live financial model under Tenant A and
+      automatically deletes it during post-test teardown to guarantee zero test pollution.
+
+
+--------------------------------------------------------------------------------
+SUITE 01: Chained E2E Business Pipelines
+Path: tests/suite_01_e2e_pipelines/
+--------------------------------------------------------------------------------
+Contains:
+- `tests/suite_01_e2e_pipelines/__init__.py`: Package descriptor.
+- `tests/suite_01_e2e_pipelines/test_suite_01_e2e.py`:
+  Implements multi-step, stateful business transactions:
+  * `test_tc_e2e_001_complete_financial_model_lifecycle`:
+      Executes a 9-step complete workflow:
+      (1) Login & token capture -> (2) Multi-part Excel upload -> (3) P&L balance
+      reconciliation validation -> (4) Interactive model conversion -> (5) Economic
+      assumptions update (WACC/Growth) -> (6) Cell autosave (D18 = D16-D17) ->
+      (7) Binary Excel export -> (8) OpenXML binary inspection with openpyxl ->
+      (9) Safe model teardown.
+  * `test_tc_e2e_002_model_duplication_and_mutability`:
+      Branches a parent model into a child scenario model, updates child revenue,
+      and proves that parent model state remains unmutated (isolated memory/storage).
+  * `test_tc_e2e_003_rollback_on_corrupted_model`:
+      Submits a spreadsheet with corrupt XML tags; validates that the transaction
+      gracefully aborts with `422/400 PARSE_ERROR` and leaves no orphan database records.
+  * `test_tc_e2e_004_session_teardown_and_eviction`:
+      Authenticates, verifies active session, logs out, and proves that replaying
+      the invalidated token/cookie is rejected with `401 Unauthorized`.
+
+
+--------------------------------------------------------------------------------
+SUITE 02: Financial Engine & Calculation Precision
+Path: tests/suite_02_financial_engine/
+--------------------------------------------------------------------------------
+Contains:
+- `tests/suite_02_financial_engine/__init__.py`: Package descriptor.
+- `tests/suite_02_financial_engine/test_suite_02_finance.py`:
+  Validates computational accuracy, formula cascades, and mathematical boundaries:
+  * `test_tc_fin_001_floating_point_precision`:
+      Submits fractional quarterly figures and asserts exact 4-decimal precision
+      without IEEE-754 binary floating-point drift (e.g., verifying `1000001.20`
+      does not drift into `1000001.2000000001`).
+  * `test_tc_fin_002_circular_reference_detection`:
+      Injects a mutually dependent recursive formula (`A1 -> B1 -> A1`) and verifies
+      that the calculation engine halts recursion within SLA (<= 500ms) and returns
+      `400 CIRCULAR_DEPENDENCY_ERROR` with the exact cycle path.
+  * `test_tc_fin_003_division_by_zero_handling`:
+      Submits formulas with zero divisors (`GrossMargin = GrossProfit / Revenue` where
+      Revenue is 0) and verifies graceful cell error formatting (`#DIV/0!`) without
+      unhandled 500 crashes.
+  * `test_tc_fin_004_formula_dependency_cascade`:
+      Modifies a root discount rate (Tier 0) and verifies that the 4-tier dependency tree
+      (Discount Factor -> PV of FCF -> Enterprise Value -> Target Share Price)
+      recalculates atomically.
+  * `test_tc_fin_005_multi_currency_normalization`:
+      Consolidates revenues across multi-national subsidiaries (USD, EUR, INR)
+      applying foreign exchange rates to produce an accurate consolidated total.
+
+
+--------------------------------------------------------------------------------
+SUITE 03: Concurrency, Race Conditions & State Locks
+Path: tests/suite_03_concurrency/
+--------------------------------------------------------------------------------
+Contains:
+- `tests/suite_03_concurrency/__init__.py`: Package descriptor.
+- `tests/suite_03_concurrency/test_suite_03_concurrency.py`:
+  Stress tests state locks, race conditions, and simultaneous user actions:
+  * `test_tc_conc_001_concurrent_autosave`:
+      Fires two concurrent asynchronous autosave requests targeting different cells
+      (C5 and D5) via `asyncio.gather`. Proves that both edits persist and neither is
+      lost due to unversioned row locking (Lost Update Problem).
+  * `test_tc_conc_002_optimistic_locking`:
+      Simulates two users attempting simultaneous model updates on the same version;
+      verifies that User A's update succeeds while User B's stale update is rejected
+      with `409 Conflict` and latest server version details.
+  * `test_tc_conc_003_double_submit_idempotency`:
+      Replays duplicate model creation requests with identical `Idempotency-Key`
+      headers; verifies that exactly one entity is created and both requests reference
+      the same `model_id`.
+  * `test_tc_conc_004_concurrent_ingestion_load`:
+      Dispatches 10 simultaneous spreadsheet uploads concurrently using `asyncio.gather`;
+      asserts that all 10 work orders queue and resolve with `200 OK` without worker OOM
+      crashes or 502 Bad Gateway errors.
+
+
+--------------------------------------------------------------------------------
+SUITE 04: Malicious File Ingestion & Parser Hardening
+Path: tests/suite_04_file_parser/
+--------------------------------------------------------------------------------
+Contains:
+- `tests/suite_04_file_parser/__init__.py`: Package descriptor.
+- `tests/suite_04_file_parser/test_suite_04_file_parser.py`:
+  Verifies defensive parser behavior against weaponized files:
+  * `test_tc_file_001_zip_bomb_mitigation`:
+      Uploads an in-memory decompression bomb disguised as an `.xlsx` file; verifies
+      that the parser detects the extreme expansion ratio and rejects it with
+      `413 Payload Too Large` or `400 Bad Request`.
+  * `test_tc_file_002_xxe_injection_defense`:
+      Uploads an OpenXML workbook with an embedded XML External Entity targeting
+      `file:///etc/passwd`; asserts that system files are not leaked in responses or sheet names.
+  * `test_tc_file_003_formula_injection_sanitization`:
+      Injects dynamic command execution formulas (`=cmd|' /C calc'!A0`) into model names;
+      verifies that exported spreadsheets disarm or escape the formula triggers.
+  * `test_tc_file_004_embedded_macro_stripping`:
+      Uploads a macro-enabled spreadsheet (`.xlsm`) containing simulated VBA payloads;
+      confirms that macros are either rejected or `vbaProject.bin` is stripped upon export.
+  * `test_tc_file_005_zero_byte_and_truncated_stream`:
+      Uploads 0-byte empty files and truncated 10-byte ZIP magic header streams; verifies
+      graceful rejection with `400 Bad Request` (`corrupt_file_header`) without unhandled tracebacks.
+
+
+--------------------------------------------------------------------------------
+SUITE 05: Security, Tenant Isolation & IDOR
+Path: tests/suite_05_security_idor/
+--------------------------------------------------------------------------------
+Contains:
+- `tests/suite_05_security_idor/__init__.py`: Package descriptor.
+- `tests/suite_05_security_idor/test_suite_05_security.py`:
+  Tests tenant boundary enforcement and web security controls:
+  * `test_tc_sec_001_horizontal_privilege_escalation_idor`:
+      Tenant A creates a proprietary model; Tenant B attempts unauthorized read (GET),
+      mutation (PUT), and deletion (DELETE). Confirms Tenant B is blocked with `403/404`.
+  * `test_tc_sec_002_idor_on_model_export`:
+      Tenant B attempts to directly download Tenant A's exported Excel model via the
+      streaming export endpoint; verifies access is denied with `403 Forbidden`.
+  * `test_tc_sec_003_csrf_protection_on_mutations`:
+      Submits a mutating POST request with an active session cookie but strips the
+      `X-CSRFToken` header; verifies that CSRF middleware blocks the request with `403 Forbidden`.
+  * `test_tc_sec_004_xss_sanitization`:
+      Submits polymorphic Cross-Site Scripting payloads (`<script>`, `<img>`, `<svg>`)
+      into model metadata; confirms that all dangerous tags are sanitized or HTML-encoded.
+  * `test_tc_sec_005_security_headers_and_leakage_audit`:
+      Audits API responses to ensure presence of `X-Content-Type-Options: nosniff`,
+      `X-Frame-Options: DENY`, HSTS, and `Cache-Control: no-store`, while verifying
+      absence of framework/CPython version disclosure in the `Server` header.
+  * `test_tc_sec_006_replay_attack_after_session_invalidation`:
+      Captures an authorization bearer token, executes logout, and replays the captured
+      token; verifies that the server invalidates the token and rejects replay with `401 Unauthorized`.
+
+
+--------------------------------------------------------------------------------
+SUITE 06: Latency Benchmarks & Rate Limiting
+Path: tests/suite_06_performance/
+--------------------------------------------------------------------------------
+Contains:
+- `tests/suite_06_performance/__init__.py`: Package descriptor.
+- `tests/suite_06_performance/test_suite_06_performance.py`:
+  Measures throughput, rate limiting, and parameter resilience:
+  * `test_tc_perf_001_recalculation_latency_benchmark`:
+      Submits a heavy 5-year monthly model (60 periods x 150 accounts = 9,000 cells)
+      to the recalculation engine; verifies execution finishes well within SLA (<= 1500ms).
+  * `test_tc_perf_002_login_brute_force_rate_limiting`:
+      Dispatches 15 rapid sequential failed login attempts from a single client;
+      asserts that the server triggers rate limiting after 5 attempts, returning
+      `429 Too Many Requests` with a valid `Retry-After` header.
+  * `test_tc_perf_003_search_query_sanity_and_sql_injection`:
+      Executes complex multi-parameter filter queries within search SLA (<= 300ms)
+      and submits SQL injection attack vectors (`' OR '1'='1`), proving queries use
+      safe parameterization and do not leak SQL syntax errors.
+
+
+================================================================================
+9. RUNTIME, CACHE & SYSTEM DIRECTORIES
+================================================================================
+
+1. allure-results/
+--------------------------------------------------------------------------------
+- Purpose:
+  Runtime output directory where `allure-pytest` writes raw test execution telemetry.
+- Contents:
+  * `*-result.json`: Individual test execution metadata (test name, status, duration,
+    start/stop timestamps, test steps, severity, suite markers).
+  * `*-container.json`: Test fixture setup and teardown lifecycle metadata.
+  * `*-attachment.json` & `*-attachment.txt`: Captured request/response payloads,
+    timing metrics, and error logs attached during test execution.
+- Usage:
+  Compiled into an interactive HTML dashboard using `allure generate` or `allure serve`.
+
+2. .pytest_cache/
+--------------------------------------------------------------------------------
+- Purpose:
+  Internal cache created by the Pytest runner to store state between executions.
+- Contents:
+  * `v/cache/lastfailed`: Tracks tests that failed in the previous run for `--lf` reruns.
+  * `v/cache/stepwise`: Tracks resumption point when using the `--sw` flag.
+  * `v/cache/nodeids`: Cached mapping of discovered test node identifiers.
+
+3. .venv/
+--------------------------------------------------------------------------------
+- Purpose:
+  Isolated Python 3.12 virtual environment containing installed third-party libraries
+  (pytest, openpyxl, httpx, requests, allure-pytest, etc.) and executable binaries.
+- Standard Sub-structure:
+  * `.venv/bin/`: Contains `python`, `pip`, `pytest`, and related executable entry points.
+  * `.venv/lib/python3.12/site-packages/`: Contains all installed library wheels.
+  * `.venv/pyvenv.cfg`: Virtual environment configuration mapping to the system Python interpreter.
+
+4. .idea/
+--------------------------------------------------------------------------------
+- Purpose:
+  Integrated Development Environment (IDE) project configuration directory generated
+  by JetBrains IDEs (PyCharm).
+- Contents:
+  Stores project-specific settings, interpreter associations, and code inspection profiles.
+
+5. __pycache__/ (present in each package directory)
+--------------------------------------------------------------------------------
+- Purpose:
+  Directories automatically created by the Python interpreter to store compiled
+  bytecode (`.pyc` files) for imported modules, speeding up module loading.
+
+
+================================================================================
+10. INTER-COMPONENT DATA FLOW & WORKFLOW EXECUTION
+================================================================================
+
+1. Execution Flow:
+   - When `pytest` is executed:
+     1. `pytest.ini` is parsed: configuration options (`--alluredir=allure-results`,
+        `--strict-markers`), asyncio settings, and marker definitions are loaded.
+     2. `tests/conftest.py` initializes:
+        - Evaluates CLI options (`--live` or `--mock`).
+        - The `settings` fixture loads configuration from `config/settings.py` and `.env`.
+        - The `mock_server` fixture automatically starts `MockAiravatServer` on
+          `127.0.0.1:8008` if `USE_MOCK` is true.
+     3. Pytest discovers and runs the test classes in `tests/suite_01_e2e_pipelines/`
+        through `tests/suite_06_performance/`.
+     4. During each test:
+        - `AiravatApiClient` handles synchronous HTTP calls and logs Allure steps.
+        - `AiravatAsyncClient` handles concurrent asynchronous calls.
+        - `utils/file_generator.py` generates in-memory spreadsheet buffers.
+        - `utils/assertions.py` validates precision, security headers, and sanitization.
+        - `test_data/payloads.py` provides financial figures and attack strings.
+     5. After test execution completes:
+        - Teardown blocks in `conftest.py` delete created test models.
+        - `mock_server` fixture cleanly shuts down the server socket.
+        - Allure JSON files in `allure-results/` are ready for report generation.
+
+2. Switching Environments:
+   - To run against the built-in mock server:
+     `pytest`  (or `pytest --mock`)
+   - To run against the live backend (`https://10.20.11.244:3000`):
+     `pytest --live`  (or set `AIRAVAT_USE_MOCK=false` in `.env`)
+================================================================================
+END OF SPECIFICATION GUIDE
+================================================================================

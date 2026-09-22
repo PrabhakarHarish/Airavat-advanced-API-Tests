@@ -1,0 +1,15 @@
+{
+  "url": "http://127.0.0.1:8008/API/models/model_64331/",
+  "method": "DELETE",
+  "status_code": 403,
+  "elapsed_ms": "3.49 ms",
+  "request_headers": {
+    "User-Agent": "python-requests/2.34.2",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "X-CSRFToken": "csrf_1789976864",
+    "Authorization": "Bearer jwt_token_for_analyst_beta_1789976864"
+  },
+  "request_payload": null
+}

@@ -1,0 +1,15 @@
+{
+  "url": "http://127.0.0.1:8008/API/models/model_19908/",
+  "method": "GET",
+  "status_code": 403,
+  "elapsed_ms": "1.27 ms",
+  "request_headers": {
+    "User-Agent": "python-requests/2.34.2",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "X-CSRFToken": "csrf_1789976219",
+    "Authorization": "Bearer jwt_token_for_analyst_beta_1789976219"
+  },
+  "request_payload": null
+}

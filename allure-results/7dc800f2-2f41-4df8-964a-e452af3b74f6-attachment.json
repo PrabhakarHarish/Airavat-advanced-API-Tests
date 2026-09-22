@@ -1,0 +1,1 @@
+{"id": "model_branch_18298", "name": "Model_A_Scenario_Bear", "owner": "analyst_alpha", "revenue": 700000, "version": 2, "parent_id": "model_18296", "cells": {"D18": {"value": 5000000, "formula": "=D16-D17"}}}

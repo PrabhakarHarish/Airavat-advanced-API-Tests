@@ -1,0 +1,20 @@
+{
+  "url": "http://127.0.0.1:8008/API/models/model_lock_002/",
+  "method": "PUT",
+  "status_code": 200,
+  "elapsed_ms": "2.76 ms",
+  "request_headers": {
+    "User-Agent": "python-requests/2.34.2",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "X-CSRFToken": "csrf_1789976278",
+    "Authorization": "Bearer jwt_token_for_analyst_alpha_1789976278"
+  },
+  "request_payload": {
+    "version": 5,
+    "assumptions": {
+      "wacc": 0.08
+    }
+  }
+}

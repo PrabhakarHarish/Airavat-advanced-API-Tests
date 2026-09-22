@@ -1,0 +1,17 @@
+{
+  "url": "http://127.0.0.1:8008/API/models/",
+  "method": "POST",
+  "status_code": 201,
+  "elapsed_ms": "1.39 ms",
+  "request_headers": {
+    "User-Agent": "python-requests/2.34.2",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "X-CSRFToken": "csrf_1789976219",
+    "Authorization": "Bearer jwt_token_for_analyst_alpha_1789976219"
+  },
+  "request_payload": {
+    "name": "=cmd|' /C calc'!A0"
+  }
+}

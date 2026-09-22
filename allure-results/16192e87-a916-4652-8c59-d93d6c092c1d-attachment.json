@@ -1,0 +1,28 @@
+{
+  "url": "http://127.0.0.1:8008/API/models/cascade_model/",
+  "method": "PUT",
+  "status_code": 200,
+  "elapsed_ms": "1.41 ms",
+  "request_headers": {
+    "User-Agent": "python-requests/2.34.2",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "X-CSRFToken": "csrf_1789976218",
+    "Authorization": "Bearer jwt_token_for_analyst_alpha_1789976218"
+  },
+  "request_payload": {
+    "assumptions": {
+      "discount_rate": 0.1,
+      "projected_fcf": [
+        5000000,
+        5500000,
+        6000000,
+        6500000,
+        7000000
+      ],
+      "shares_outstanding": 10000000,
+      "net_debt": 2000000
+    }
+  }
+}

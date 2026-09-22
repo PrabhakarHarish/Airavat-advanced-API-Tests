@@ -1,0 +1,44 @@
+{
+  "url": "http://127.0.0.1:8008/API/models/pnl_test/recalculate/",
+  "method": "POST",
+  "status_code": 200,
+  "elapsed_ms": "2.49 ms",
+  "request_headers": {
+    "User-Agent": "python-requests/2.34.2",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "X-CSRFToken": "csrf_1789976772",
+    "Authorization": "Bearer jwt_token_for_analyst_alpha_1789976772"
+  },
+  "request_payload": {
+    "statement_type": "PNL",
+    "periods": [
+      "Q1",
+      "Q2",
+      "Q3",
+      "Q4",
+      "FY"
+    ],
+    "line_items": {
+      "Operating_Revenue": [
+        100000.15,
+        200000.25,
+        300000.35,
+        400000.45
+      ],
+      "Direct_Cost": [
+        40000.05,
+        80000.1,
+        120000.15,
+        160000.2
+      ],
+      "Gross_Profit": [
+        60000.1,
+        120000.15,
+        180000.2,
+        240000.25
+      ]
+    }
+  }
+}

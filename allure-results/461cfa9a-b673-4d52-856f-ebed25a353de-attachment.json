@@ -1,0 +1,29 @@
+{
+  "url": "http://127.0.0.1:8008/API/models/circ_model_002/autosave/",
+  "method": "POST",
+  "status_code": 400,
+  "elapsed_ms": "4.04 ms",
+  "request_headers": {
+    "User-Agent": "python-requests/2.34.2",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "X-CSRFToken": "csrf_1789982251",
+    "Authorization": "Bearer jwt_token_for_analyst_alpha_1789982251"
+  },
+  "request_payload": {
+    "active_cell": "A1",
+    "changes": [
+      {
+        "cell": "A1",
+        "value": null,
+        "formula": "=B1 * 1.05"
+      },
+      {
+        "cell": "B1",
+        "value": null,
+        "formula": "=A1 + 100"
+      }
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+{"id": "model_lock_002", "name": "Default_Model", "owner": "analyst_alpha", "revenue": 1000000, "version": 5, "cells": {"C5": {"value": "1000"}, "D5": {"value": "2000"}, "D18": {"value": 5000000, "formula": "=D16-D17"}}}

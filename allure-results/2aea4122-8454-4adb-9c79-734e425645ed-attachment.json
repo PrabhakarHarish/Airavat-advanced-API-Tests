@@ -1,0 +1,18 @@
+{
+  "url": "http://127.0.0.1:8008/API/excel/convert-to-model/",
+  "method": "POST",
+  "status_code": 200,
+  "elapsed_ms": "2.27 ms",
+  "request_headers": {
+    "User-Agent": "python-requests/2.34.2",
+    "Accept-Encoding": "gzip, deflate",
+    "Accept": "*/*",
+    "Connection": "keep-alive",
+    "X-CSRFToken": "csrf_1789982253",
+    "Authorization": "Bearer jwt_token_for_analyst_alpha_1789982253"
+  },
+  "request_payload": {
+    "template_id": "tpl_1789982253026",
+    "name": "Tenant_A_Base_Model"
+  }
+}

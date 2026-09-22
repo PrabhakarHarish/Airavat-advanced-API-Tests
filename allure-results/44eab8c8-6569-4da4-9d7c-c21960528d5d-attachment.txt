@@ -1,0 +1,18 @@
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 44412)
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/home/harish/Desktop/Airavat advanced API testing /mock_server/airavat_mock_api.py", line 296, in do_POST
+    raw_name = data.get("name", "New Model")
+               ^^^^
+UnboundLocalError: cannot access local variable 'data' where it is not associated with a value
+----------------------------------------
